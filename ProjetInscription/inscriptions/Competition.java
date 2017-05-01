@@ -26,12 +26,13 @@ public class Competition implements Comparable<Competition>, Serializable
 	private Connect connect;
 	
 	
-	Competition(Inscriptions inscriptions, String nom, LocalDate dateCloture, boolean enEquipe)
+	Competition(Inscriptions inscriptions, String nom, LocalDate dateCloture, boolean enEquipe,int id)
 	{
 		this.enEquipe = enEquipe;
 		this.inscriptions = inscriptions;
 		this.nom = nom;
 		this.dateCloture = dateCloture;
+		this.id = id;
 		candidats = new TreeSet<Candidat>();
 	}
 	
@@ -48,7 +49,6 @@ public class Competition implements Comparable<Competition>, Serializable
 	/**
 	 * Modifie le nom de la compétition.
 	 */
-	
 	public void setNom(String nom)
 	{
 		this.nom = nom ;

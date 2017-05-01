@@ -1,5 +1,6 @@
 package src;
 
+
 import inscriptions.Candidat;
 import inscriptions.Competition;
 import inscriptions.Equipe;
@@ -155,27 +156,7 @@ public class Connect {
 
  /*competition*/
  
- public SortedSet<Competition> getCompetitions() throws SQLException{
-	 Inscriptions inscription;
-	 inscription = Inscriptions.getInscriptions();
-	 SortedSet<Competition> competitions = new TreeSet<Competition>();
-	 
-	 ResultSet rs = resultatRequete("SELECT * FROM Competition");
-	 while(rs.next()){
-		int num = rs.getInt("NumComp");
-		String nom = rs.getString("NomComp");
-		LocalDate date = rs.getDate("DateCloture").toLocalDate();
-		Boolean enEquipe = rs.getBoolean("EnEquipe");
-		System.out.println("num"+num+"nom "+nom+" date: "+ date+""+enEquipe+"");
-		Competition competition = inscription.createCompetition(nom,
-				 date, 
-				 enEquipe); 
-		competitions.add(competition);
-		 
-	 }
-	 
-	 return competitions;
- }
+
  public void add(Competition competition){
    requete("call ADD_COMP('"+competition.getNom()+"','"+
 		   competition.getDateCloture()+"',"+competition.estEnEquipe()+")");
@@ -198,9 +179,17 @@ public class Connect {
  /*Personne*/
  
  public void add(Personne personne){
-   requete("call ADD_PERSONNE('"+personne.getNom()+
+	 ResultSet rs = null;
+	 requete("call ADD_PERSONNE('"+personne.getNom()+
 		   "','"+personne.getMail()+
 		   "','"+personne.getPrenom()+"')");
+	 rs = resultatRequete("Select NumCandidat FROM Candidat");
+	 while (rs.next()) {
+		if (rs.last()) {
+			personne.setIdCand(rs.getInt("NumCandidat"));
+		}
+		
+	}
  }
  
  public void setPrenomPersonne(String prenom,int id){

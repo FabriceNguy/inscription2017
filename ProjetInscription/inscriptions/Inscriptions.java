@@ -45,29 +45,33 @@ public class Inscriptions implements Serializable
 	
 	{
 		SortedSet<Competition> competitions = new TreeSet<Competition>();
-		 
-		 ResultSet rs = connect.resultatRequete("SELECT * FROM Competition");
-		 try {
-			while(rs.next()){
-				int num = rs.getInt("NumComp");
-				String nom = rs.getString("NomComp");
-				LocalDate date = rs.getDate("DateCloture").toLocalDate();
-				Boolean enEquipe = rs.getBoolean("EnEquipe");
-				System.out.println("num"+num+"nom "+nom+" date: "+ date+""+enEquipe+"");
-				Competition competition = new Competition( inscriptions,nom,
-						 date, 
-						 enEquipe); 
-				competitions.add(competition);
-				 
-			 }
-		} catch (SQLException e) {
-			System.out.println("Erreur de connection à la BDD");
-			e.printStackTrace();
+		 if(!SERIALIZE){
+			 ResultSet rs = connect.resultatRequete("SELECT * FROM Competition");
+			 
+			 try {
+				while(rs.next()){
+					int num = rs.getInt("NumComp");
+					String nom = rs.getString("NomComp");
+					LocalDate date = rs.getDate("DateCloture").toLocalDate();
+					Boolean enEquipe = rs.getBoolean("EnEquipe");
+					
+					System.out.println("num"+num+"nom "+nom+" date: "+ date+""+enEquipe+"");
+					Competition competition = new Competition( inscriptions,
+							 nom,
+							 date, 
+							 enEquipe,
+							 num); 
+					competitions.add(competition);
+					
+					 
+				 }
+			} catch (SQLException e) {
+				
+				e.printStackTrace();
+			}
 		}
-		finally{
-			connect.close();
-		}
-		 
+		
+		
 		return Collections.unmodifiableSortedSet(competitions);
 	}
 	
@@ -90,8 +94,8 @@ public class Inscriptions implements Serializable
 	{
 		SortedSet<Personne> personnes = new TreeSet<Personne>();
 		ResultSet rs = connect.resultatRequete("SELECT * "
-				+ "FROM Candidat, Personne"
-				+ "WHERE Equipe = 0 "
+				+ "FROM Candidat"
+				+ "WHERE NumCandidat NOT IN (select NumCandidatPers FROM Personne"
 				+ "AND Equipe.NumCandPersonne = Candidat.NumCandidat");
 		try {
 			while(rs.next()){				
@@ -314,7 +318,7 @@ public class Inscriptions implements Serializable
 			+ "\nCompetitions  " + getCompetitions().toString();
 	}
 	
-	public static void main(String[] args)
+	/*public static void main(String[] args)
 	{
 		LocalDate date = LocalDate.of(2017,Month.APRIL,10);
 		Inscriptions inscriptions = Inscriptions.getInscriptions();
@@ -338,9 +342,10 @@ public class Inscriptions implements Serializable
 			System.out.println("Sauvegarde impossible." + e);
 		}
 		*/
+	/*
 		competitions = inscriptions.getCompetitions();
 	}
-	
+	*/
 	
 	public void openConnection()
 	{
@@ -350,5 +355,8 @@ public class Inscriptions implements Serializable
 	public void closeConnection()
 	{
 		connect.close();
+	}
+	public static void main(String[] args) {
+		System.out.println("bla");
 	}
 }
